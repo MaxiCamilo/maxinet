@@ -2,8 +2,11 @@ using System;
 
 namespace MaxiNet;
 
+
 public abstract class Result<T>
 {
+    
+
     private protected Result() { }
 
 
@@ -11,6 +14,11 @@ public abstract class Result<T>
     {
         return ResultFactory.Try(new Oration("An error occurred"), fn);
     }
+}
+
+public static class Res
+{
+    public static readonly Result<Nothing> Ok = new ResultValue<Nothing>(Nothing.Value); 
 }
 
 public interface IFailure
@@ -21,9 +29,25 @@ public interface IFailure
 
 public sealed class ResultValue<T>(T content) : Result<T>
 {
+
     public T Content { get; } = content;
     public override string ToString() => $"Result: {Content}";
 }
+
+
+public readonly struct Nothing : IEquatable<Nothing>
+{
+    public static readonly Nothing Value = default;
+
+    public bool Equals(Nothing other) => true;
+    public override bool Equals(object? obj) => obj is Nothing;
+    public override int GetHashCode() => 0;
+    public override string ToString() => "Nothing";
+
+    public static bool operator ==(Nothing a, Nothing b) => true;
+    public static bool operator !=(Nothing a, Nothing b) => false;
+}
+
 
 public abstract class ResultFailure<T> : Result<T>, IFailure
 {

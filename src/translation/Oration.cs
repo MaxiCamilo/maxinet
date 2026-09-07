@@ -8,7 +8,7 @@ public record Oration(string Message, IReadOnlyList<string>? Parts = null)
     public IReadOnlyList<string> Parts { get; init; } = Parts ?? [];
 
     public override string ToString()
-    {        
+    {    
         if (Parts.Count == 0)
         {
             return Message;
