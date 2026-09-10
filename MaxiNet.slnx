@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="lib/MaxiNet.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MaxiNet.Tests/MaxiNet.Tests.csproj" />
+  </Folder>
+</Solution>

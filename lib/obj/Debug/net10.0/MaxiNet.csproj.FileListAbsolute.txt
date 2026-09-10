@@ -1,0 +1,12 @@
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/bin/Debug/net10.0/MaxiNet.deps.json
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/bin/Debug/net10.0/MaxiNet.dll
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/bin/Debug/net10.0/MaxiNet.pdb
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/MaxiNet.GeneratedMSBuildEditorConfig.editorconfig
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/MaxiNet.AssemblyInfoInputs.cache
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/MaxiNet.AssemblyInfo.cs
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/MaxiNet.csproj.CoreCompileInputs.cache
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/MaxiNet.sourcelink.json
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/MaxiNet.dll
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/refint/MaxiNet.dll
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/MaxiNet.pdb
+/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/Debug/net10.0/ref/MaxiNet.dll
