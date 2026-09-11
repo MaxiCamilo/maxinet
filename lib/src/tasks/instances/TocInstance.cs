@@ -15,7 +15,7 @@ public interface ITocInstance
 
 internal class TocInstance : Initializable, ITocInstance
 {
-    public int ThreadCount { get; init; } = 1;//Environment.ProcessorCount;
+    public int ThreadCount { get; init; } = Environment.ProcessorCount;
     public SharedTaskPool TaskPool { get; init; } = new SharedTaskPool();
 
     private MaxiThreadInstance[] _threads = Array.Empty<MaxiThreadInstance>();
@@ -50,12 +50,12 @@ internal class TocInstance : Initializable, ITocInstance
 
     public Task<Result<Nothing>> Add(Action action)
     {
-        return TaskPool.BuildTask(action);
+        return TaskPool.BuildTask(() => { action(); return Res.Ok; });
     }
 
     public Task<Result<T>> Add<T>(Func<T> function)
     {
-        return TaskPool.BuildTask(function);
+        return TaskPool.BuildTask(() => Res.Value(function()));
     }
 
     public Task<Result<T>> Add<T>(Func<Task<T>> function)

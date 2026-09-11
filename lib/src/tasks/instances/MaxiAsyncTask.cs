@@ -3,7 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 namespace MaxiNet;
 
-internal class MaxiAsyncTask<T> : Initializable
+internal interface IMaxiAsyncTask
+{
+    public Result<Action> BuildRunner();
+}
+
+internal class MaxiAsyncTask<T> : Initializable, IMaxiAsyncTask
 {
     public required Func<CancellationToken, Task<Result<T>>> Action { get; init; }
 
@@ -16,29 +21,32 @@ internal class MaxiAsyncTask<T> : Initializable
 
     protected override Result<Nothing> PerformInitialization()
     {
-        _executionContext = ExecutionContext.Capture();
-
         return Res.Ok;
     }
 
 
+    public Result<Action> BuildRunner()
+    {
+        if (Initialize().OnError(out var initError)) return initError.Cast<Action>();
 
-    public Task<Result<T>> Run(Func<Action, dynamic> postAction)
+        _completion ??= new TaskCompletionSource<Result<T>>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _executionContext ??= ExecutionContext.Capture();
+
+        Action envuelto =
+                     () => ExecutionContext.Run(_executionContext!, static s => ((MaxiAsyncTask<T>)s!).StarOrResumeTask(), this);
+
+
+
+        return Res.Value(envuelto);
+    }
+
+
+    public Task<Result<T>> WaitResult()
     {
         var initResult = Initialize();
         if (initResult is IFailure failure) return Task.FromResult(failure.Cast<T>());
 
-        if (_completion is not null) throw new ArgumentException("The task has already been started");
-
-
-        _completion = new TaskCompletionSource<Result<T>>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-
-        Action envuelto = _executionContext is null
-            ? StarOrResumeTask
-            : () => ExecutionContext.Run(_executionContext, static s => ((MaxiAsyncTask<T>)s!).StarOrResumeTask(), this);
-
-        postAction(envuelto);
+        _completion ??= new TaskCompletionSource<Result<T>>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         return _completion!.Task;
     }

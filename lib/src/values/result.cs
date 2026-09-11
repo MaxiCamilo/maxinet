@@ -119,11 +119,13 @@ public interface IFailure
     Result<R> Cast<R>();
 }
 
-public sealed class ResultValue<T>(T content) : Result<T>
+public sealed class ResultValue<T>(T content) : Result<T>, IEquatable<ResultValue<T>>
 {
-
     public T Content { get; } = content;
     public override string ToString() => $"Result: {Content}";
+    public bool Equals(ResultValue<T>? other) => other is not null && EqualityComparer<T>.Default.Equals(Content, other.Content);
+    public override bool Equals(object? obj) => obj is ResultValue<T> other && Equals(other);
+    public override int GetHashCode() => Content == null ? 0 : EqualityComparer<T>.Default.GetHashCode(Content);
 }
 
 

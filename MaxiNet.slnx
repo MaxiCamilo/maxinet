@@ -5,4 +5,11 @@
   <Folder Name="/tests/">
     <Project Path="tests/MaxiNet.Tests/MaxiNet.Tests.csproj" />
   </Folder>
+  <Folder Name="/MyPhotinoApp/">
+    <Project Path="MyPhotinoApp/HelloPhotino.NET.csproj" />
+  </Folder>
+  <Folder Name="/TestApp/">
+    <Project Path="TestApp/TestApp.csproj" />
+  </Folder>
+  <Project Path="Prueba/Prueba.csproj" />
 </Solution>

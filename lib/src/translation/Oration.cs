@@ -7,8 +7,10 @@ public record Oration(string Message, IReadOnlyList<string>? Parts = null)
 {
     public IReadOnlyList<string> Parts { get; init; } = Parts ?? [];
 
+    public static readonly Oration Empty = new (string.Empty);
+
     public override string ToString()
-    {    
+    {
         if (Parts.Count == 0)
         {
             return Message;
@@ -26,7 +28,7 @@ public record Oration(string Message, IReadOnlyList<string>? Parts = null)
                 {
                     buffer.Append(Parts[partIndex]);
                     partIndex++;
-                    
+
                     continue;
                 }
 

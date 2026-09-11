@@ -43,7 +43,7 @@ namespace MaxiNet
                 {
                     break;
                 }
-                else if (TaskPool.ParalyzeNextTask(_cancellationToken.Token).TryGetValue(out var action, out var error))
+                else if (TaskPool.ParalyzeNextAction(_cancellationToken.Token).TryGetValue(out var action, out var error))
                 {
                     action();
                 }

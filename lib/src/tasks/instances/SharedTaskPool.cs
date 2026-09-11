@@ -5,37 +5,39 @@ namespace MaxiNet
 {
     internal class SharedTaskPool
     {
-        private readonly ConcurrentQueue<Action> _actionList = new();
+        //private readonly ConcurrentQueue<IMaxiAsyncTask> _taskList = new();
+
+        private readonly ConcurrentQueue<Action> _taskList = new();
 
         private readonly IStreamController<SharedTaskPool> _newActionQueueStream = StreamController<SharedTaskPool>.ThreadSafe();
 
 
-        public bool HasPendingActions => !_actionList.IsEmpty;
+        public bool HasPendingActions => !_taskList.IsEmpty;
 
 
 
         public Result<Nothing> QueueAction(Action a)
         {
-            _actionList.Enqueue(a);
+            _taskList.Enqueue(a);
 
             _newActionQueueStream.AddItem(this);
 
             return Res.Ok;
         }
 
-        public bool TryDequeue(out Action? action)
+        public bool TryDequeue(out Action? task)
         {
-            return _actionList.TryDequeue(out action);
+            return _taskList.TryDequeue(out task);
         }
 
-        public Result<Action> ParalyzeNextTask(CancellationToken? cancellationToken = null)
+        public Result<Action> ParalyzeNextAction(CancellationToken? cancellationToken = null)
         {
             while (true)
             {
-                if (TryDequeue(out var action))
+                if (TryDequeue(out var task))
                 {
-                    if (action != null)
-                        return Res.Value(action);
+                    if (task != null)
+                        return Res.Value(task);
                 }
 
                 if (cancellationToken.HasValue && cancellationToken.Value.IsCancellationRequested)
@@ -52,7 +54,7 @@ namespace MaxiNet
 
         public SynchronizationContext BuildSynchronizationContext() => new PoolContext(this);
 
-        public Task<Result<T>> BuildTask<T>(Func<T> func)
+        public Task<Result<T>> BuildTask<T>(Func<Result<T>> func)
         {
             var task = new MaxiAsyncTask<T>()
             {
@@ -60,7 +62,7 @@ namespace MaxiNet
                 {
                     try
                     {
-                        return Res.Value(func());
+                        return func();
                     }
                     catch (Exception ex)
                     {
@@ -68,26 +70,42 @@ namespace MaxiNet
                     }
                 }
             };
-            return task.Run((x) => QueueAction(x));
+            if (QueueAction(() => task.BuildRunner()).OnError(out var queueError))
+                return Task.FromResult(queueError.Cast<T>());
+
+            return task.WaitResult();
         }
 
-        public Task<Result<Nothing>> BuildTask(Action func)
+        public Task<Result<T>> BuildTask<T>(Func<Task<Result<T>>> func)
         {
-            var task = new MaxiAsyncTask<Nothing>()
+            var task = new MaxiAsyncTask<T>()
             {
                 Action = async (_) =>
                 {
                     try
                     {
-                        return Res.Ok;
+                        return await func();
                     }
                     catch (Exception ex)
                     {
-                        return new ExceptionResult<Nothing>(ex, new Oration("An exception occurred"));
+                        return new ExceptionResult<T>(ex, new Oration("An exception occurred"));
                     }
                 }
             };
-            return task.Run((x) => QueueAction(x));
+            if (QueueAction(() =>
+            {
+                if (task.BuildRunner().TryGetValue(out var action, out var buildError))
+                {
+                    action();
+                }
+                else
+                {
+                    Console.WriteLine(buildError);
+                }
+            }).OnError(out var queueError))
+                return Task.FromResult(queueError.Cast<T>());
+
+            return task.WaitResult();
         }
 
         public Task<Result<T>> BuildTask<T>(Func<Task<T>> func)
@@ -98,8 +116,7 @@ namespace MaxiNet
                 {
                     try
                     {
-                        var value = Task.Run(() => func(), ct);
-                        return Res.Value(await value);
+                        return Res.Value(await func());
                     }
                     catch (Exception ex)
                     {
@@ -107,33 +124,20 @@ namespace MaxiNet
                     }
                 }
             };
-            return task.Run((x) => QueueAction(x));
+            if (QueueAction(() => task.BuildRunner()).OnError(out var queueError))
+                return Task.FromResult(queueError.Cast<T>());
+
+            return task.WaitResult();
         }
 
-        public Task<Result<T>> BuildTask<T>(Func<Task<Result<T>>> func)
-        {
-            var task = new MaxiAsyncTask<T>()
-            {
-                Action = async (ct) =>
-                {
-                    try
-                    {
-                        var value = Task.Run(() => func(), ct);
-                        return await value;
-                    }
-                    catch (Exception ex)
-                    {
-                        return new ExceptionResult<T>(ex, new Oration("An exception occurred"));
-                    }
-                }
-            };
-            return task.Run((x) => QueueAction(x));
-        }
+
 
         private sealed class PoolContext(SharedTaskPool pool) : SynchronizationContext
         {
-            public override void Post(SendOrPostCallback d, object? s)
-                => pool.QueueAction(() => d(s));
+            public override void Post(SendOrPostCallback d, object? s) =>
+
+                pool.QueueAction(() => d(s));
+
 
             public override SynchronizationContext CreateCopy() => this;
         }

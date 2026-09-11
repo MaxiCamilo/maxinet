@@ -1,0 +1,77 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build Prueba",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/Prueba/Prueba.csproj",
+        "-c",
+        "Debug"
+      ],
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "build TestApp",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/TestApp/TestApp.csproj",
+        "-c",
+        "Debug"
+      ],
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "build MyPhotinoApp",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/MyPhotinoApp/HelloPhotino.NET.csproj",
+        "-c",
+        "Debug"
+      ],
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "group": "build"
+    },
+    {
+      "label": "build runnable projects",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${input:projectToBuild}",
+        "-c",
+        "Debug"
+      ],
+      "problemMatcher": [
+        "$msCompile"
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "projectToBuild",
+      "type": "pickString",
+      "description": "Choose the project to build before debugging",
+      "options": [
+        "${workspaceFolder}/Prueba/Prueba.csproj",
+        "${workspaceFolder}/TestApp/TestApp.csproj",
+        "${workspaceFolder}/MyPhotinoApp/HelloPhotino.NET.csproj"
+      ],
+      "default": "${workspaceFolder}/Prueba/Prueba.csproj"
+    }
+  ]
+}

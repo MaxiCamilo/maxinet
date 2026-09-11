@@ -1,0 +1,79 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Prueba (F5 default)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build Prueba",
+      "program": "${workspaceFolder}/Prueba/bin/Debug/net10.0/Prueba.dll",
+      "cwd": "${workspaceFolder}/Prueba",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "TestApp",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build TestApp",
+      "program": "${workspaceFolder}/TestApp/bin/Debug/net10.0/TestApp.dll",
+      "cwd": "${workspaceFolder}/TestApp",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "MyPhotinoApp",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build MyPhotinoApp",
+      "program": "${workspaceFolder}/MyPhotinoApp/bin/Debug/net10.0/HelloPhotino.NET.dll",
+      "cwd": "${workspaceFolder}/MyPhotinoApp",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Choose built DLL",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build runnable projects",
+      "program": "${input:pickDll}",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Custom DLL path",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${input:customDllPath}",
+      "cwd": "${input:customWorkingDir}",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ],
+  "inputs": [
+    {
+      "id": "pickDll",
+      "type": "pickString",
+      "description": "Choose which built DLL to run",
+      "options": [
+        "${workspaceFolder}/Prueba/bin/Debug/net10.0/Prueba.dll",
+        "${workspaceFolder}/TestApp/bin/Debug/net10.0/TestApp.dll",
+        "${workspaceFolder}/MyPhotinoApp/bin/Debug/net10.0/HelloPhotino.NET.dll"
+      ],
+      "default": "${workspaceFolder}/Prueba/bin/Debug/net10.0/Prueba.dll"
+    },
+    {
+      "id": "customDllPath",
+      "type": "promptString",
+      "description": "Absolute path to the DLL to run",
+      "default": "${workspaceFolder}/Prueba/bin/Debug/net10.0/Prueba.dll"
+    },
+    {
+      "id": "customWorkingDir",
+      "type": "promptString",
+      "description": "Working directory for the process",
+      "default": "${workspaceFolder}"
+    }
+  ]
+}
