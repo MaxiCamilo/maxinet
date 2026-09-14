@@ -1,46 +1,33 @@
-using System;
+namespace MaxiNet;
 
-namespace MaxiNet
+public interface IMaxiDisposable : IDisposable
 {
-    public interface IMaxiDisposable : IDisposable
-    {
-        public bool IsDisposed { get; }
+    public bool IsDisposed { get; }
+}
 
+public abstract class Disposable : IDisposable, IMaxiDisposable
+{
+    public void Dispose()
+    {
+        if (IsDisposed) return;
+        IsDisposed = true;
+        PerformDispose();
     }
 
+    public bool IsDisposed { get; private set; }
 
-    abstract public class Disposable : IDisposable, IMaxiDisposable
+    protected virtual void PerformDispose()
     {
-
-        public bool IsDisposed { get; private set; } = false;
-
-        protected virtual void PerformDispose() { }
-
-        public void Dispose()
-        {
-            if (IsDisposed)
-            {
-                return;
-            }
-            IsDisposed = true;
-            PerformDispose();
-
-        }
     }
+}
 
-    static public class DisposableExtensions
+public static class DisposableExtensions
+{
+    public static Result<Nothing> ErrorIfDispose(this IMaxiDisposable disposable)
     {
-        static public Result<Nothing> ErrorIfDispose(this IMaxiDisposable disposable)
-        {
-            if (disposable.IsDisposed)
-            {
-                return Res.Error("The object you are trying to use has been disposed and cannot (and should not) be reused");
-            }
-            return Res.Ok;
-        }
+        if (disposable.IsDisposed)
+            return Res.Error(
+                "The object you are trying to use has been disposed and cannot (and should not) be reused");
+        return Res.Ok;
     }
-
-
-
-
 }

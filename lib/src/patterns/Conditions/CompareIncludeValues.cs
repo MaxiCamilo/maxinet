@@ -1,6 +1,11 @@
+using System.Collections;
+
 namespace MaxiNet;
 
-public class CompareIncludeValues
+public record CompareIncludeValues(object Value, IEnumerable Content) : ICondition, IDirectCondition
 {
-    
+    public bool Execute()
+    {
+        return Content.Cast<object?>().Contains(Value);
+    }
 }

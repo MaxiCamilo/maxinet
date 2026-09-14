@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Concurrent;
 
 namespace MaxiNet;
 
 public class EnqueueTask : Disposable
 {
-    private ConcurrentQueue<Func<Task>> _tasks = new ConcurrentQueue<Func<Task>>();
-    private readonly object _lock = new object();
-    private bool _isActive = false;
+    private readonly Lock _lock = new();
+    private readonly ConcurrentQueue<Func<Task>> _tasks = new();
+    private bool _isActive;
 
     private async Task<Result<Nothing>> StartLoop()
     {
@@ -15,40 +14,31 @@ public class EnqueueTask : Disposable
         {
             _isActive = true;
         }
+
         while (true)
         {
-            if (!_tasks.TryDequeue(out var task))
-            {
-                break;
-            }
+            if (!_tasks.TryDequeue(out var task)) break;
 
             await task();
 
-            if (_tasks.IsEmpty)
-            {
-
-                break;
-            }
+            if (_tasks.IsEmpty) break;
         }
 
         lock (_lock)
         {
             _isActive = false;
         }
+
         return Res.Ok;
     }
 
     private void EnsureLoopRunning()
     {
-        if (_isActive)
-        { return; }
+        if (_isActive) return;
 
         lock (_lock)
         {
-            if (!_isActive)
-            {
-                _ = StartLoop();
-            }
+            if (!_isActive) _ = StartLoop();
         }
     }
 
@@ -77,16 +67,26 @@ public class EnqueueTask : Disposable
     public async Task<Result<T>> Add<T>(Func<Result<T>> function)
     {
         var waiter = new TaskCompletionSource<Result<T>>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _tasks.Enqueue(async () =>
+        _tasks.Enqueue(() =>
         {
             try
             {
-                var result = function();
-                waiter.SetResult(result);
+                try
+                {
+                    var result = function();
+                    waiter.SetResult(result);
+                }
+                catch (Exception ex)
+                {
+                    waiter.SetResult(new ExceptionResult<T>(ex,
+                        new Oration("An error occurred while executing the task")));
+                }
+
+                return Task.CompletedTask;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                waiter.SetResult(new ExceptionResult<T>(ex, new Oration("An error occurred while executing the task")));
+                return Task.FromException(exception);
             }
         });
 
@@ -96,24 +96,21 @@ public class EnqueueTask : Disposable
 
     public Task<Result<T>> Add<T>(Func<T> function)
     {
-        return Add<T>(() =>
-        {
-            return Res.Value(function());
-        });
+        return Add(() => Res.Value(function()));
     }
 
     public Task<Result<Nothing>> Add(Action function)
     {
-        return Add<Nothing>(() =>
+        return Add(() =>
         {
             function();
             return Res.Ok;
         });
     }
+
     protected override void PerformDispose()
     {
         base.PerformDispose();
         _tasks.Clear();
     }
 }
-

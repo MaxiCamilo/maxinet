@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6HfAWLeRWoo=",
+  "dgSpecHash": "tOS7LBQ/UBY=",
   "success": true,
-  "projectFilePath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/Prueba/Prueba.csproj",
+  "projectFilePath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/Prueba/Prueba.csproj",
   "expectedPackageFiles": [
     "/home/maxiro/.nuget/packages/avalonia/12.1.2/avalonia.12.1.2.nupkg.sha512",
     "/home/maxiro/.nuget/packages/avalonia.angle.windows.natives/2.1.27548.20260419/avalonia.angle.windows.natives.2.1.27548.20260419.nupkg.sha512",

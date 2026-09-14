@@ -2,13 +2,12 @@ namespace MaxiNet;
 
 public class SingletonValue<T> : Disposable
 {
+    private readonly IStreamController<T> _changeController = StreamController<T>.ThreadSafe();
+
+    private readonly EnqueueTask _enqueueTask = new();
+
+    private bool _hasValue;
     private T? _value;
-
-    private bool _hasValue = false;
-
-    private EnqueueTask _enqueueTask = new();
-
-    private IStreamController<T> _changeController = StreamController<T>.ThreadSafe();
 
     public Result<IStream<T>> NotifyChange()
     {
@@ -18,15 +17,7 @@ public class SingletonValue<T> : Disposable
     public Task<Result<T>> GetValue()
     {
         return _enqueueTask.Add(() =>
-        {
-            if (!_hasValue)
-            {
-                return Res.ValError<T>(new Oration("Value has not been set"));
-            }
-
-
-            return Res.Value<T>(_value!);
-        });
+            !_hasValue ? Res.ValError<T>(new Oration("Value has not been set")) : Res.Value<T>(_value!));
     }
 
     public Task<Result<Nothing>> SetValue(T value)
@@ -40,43 +31,22 @@ public class SingletonValue<T> : Disposable
         });
     }
 
-    public Task<Result<R>> Ruminate<R>(Func<T, R> func)
+    public Task<Result<TR>> Ruminate<TR>(Func<T, TR> func)
     {
         return _enqueueTask.Add(() =>
-        {
-            if (!_hasValue)
-            {
-                return Res.ValError<R>(new Oration("Value has not been set"));
-            }
-
-            return Res.Value<R>(func(_value!));
-        });
+            !_hasValue ? Res.ValError<TR>(new Oration("Value has not been set")) : Res.Value<TR>(func(_value!)));
     }
 
-    public Task<Result<R>> Ruminate<R>(Func<T, Result<R>> func)
+    public Task<Result<TR>> Ruminate<TR>(Func<T, Result<TR>> func)
     {
         return _enqueueTask.Add(() =>
-        {
-            if (!_hasValue)
-            {
-                return Res.ValError<R>(new Oration("Value has not been set"));
-            }
-
-            return func(_value!);
-        });
+            !_hasValue ? Res.ValError<TR>(new Oration("Value has not been set")) : func(_value!));
     }
 
     public Task<Result<Nothing>> Ruminate(Action<T> func)
     {
         return _enqueueTask.Add(() =>
-        {
-            if (!_hasValue)
-            {
-                return Res.ValError<Nothing>(new Oration("Value has not been set"));
-            }
-
-            return Res.Ok;
-        });
+            !_hasValue ? Res.ValError<Nothing>(new Oration("Value has not been set")) : Res.Ok);
     }
 
     protected override void PerformDispose()
@@ -86,9 +56,4 @@ public class SingletonValue<T> : Disposable
         _changeController.Dispose();
         _enqueueTask.Dispose();
     }
-
-
-
-
 }
-

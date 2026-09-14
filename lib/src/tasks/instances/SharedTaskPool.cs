@@ -1,145 +1,138 @@
-using System;
 using System.Collections.Concurrent;
 
-namespace MaxiNet
+namespace MaxiNet;
+
+internal class SharedTaskPool
 {
-    internal class SharedTaskPool
+    private readonly IStreamController<SharedTaskPool> _newActionQueueStream =
+        StreamController<SharedTaskPool>.ThreadSafe();
+    //private readonly ConcurrentQueue<IMaxiAsyncTask> _taskList = new();
+
+    private readonly ConcurrentQueue<Action> _taskList = new();
+
+
+    public bool HasPendingActions => !_taskList.IsEmpty;
+
+
+    public Result<Nothing> QueueAction(Action a)
     {
-        //private readonly ConcurrentQueue<IMaxiAsyncTask> _taskList = new();
+        _taskList.Enqueue(a);
 
-        private readonly ConcurrentQueue<Action> _taskList = new();
+        _newActionQueueStream.AddItem(this);
 
-        private readonly IStreamController<SharedTaskPool> _newActionQueueStream = StreamController<SharedTaskPool>.ThreadSafe();
+        return Res.Ok;
+    }
 
+    public bool TryDequeue(out Action? task)
+    {
+        return _taskList.TryDequeue(out task);
+    }
 
-        public bool HasPendingActions => !_taskList.IsEmpty;
-
-
-
-        public Result<Nothing> QueueAction(Action a)
+    public Result<Action> ParalyzeNextAction(CancellationToken? cancellationToken = null)
+    {
+        while (true)
         {
-            _taskList.Enqueue(a);
+            if (TryDequeue(out var task))
+                if (task != null)
+                    return Res.Value(task);
 
-            _newActionQueueStream.AddItem(this);
+            if (cancellationToken.HasValue && cancellationToken.Value.IsCancellationRequested)
+                return Res.ValError<Action>(new Oration("Operation was cancelled"));
 
-            return Res.Ok;
+            if (_newActionQueueStream.ParalyzeWaitItem<SharedTaskPool>().OnError(out var error))
+                return error.Cast<Action>();
         }
+    }
 
-        public bool TryDequeue(out Action? task)
-        {
-            return _taskList.TryDequeue(out task);
-        }
 
-        public Result<Action> ParalyzeNextAction(CancellationToken? cancellationToken = null)
+    public SynchronizationContext BuildSynchronizationContext()
+    {
+        return new PoolContext(this);
+    }
+
+    public Task<Result<T>> BuildTask<T>(Func<Result<T>> func)
+    {
+        var task = new MaxiAsyncTask<T>
         {
-            while (true)
+            Action = async _ =>
             {
-                if (TryDequeue(out var task))
+                try
                 {
-                    if (task != null)
-                        return Res.Value(task);
+                    return func();
                 }
-
-                if (cancellationToken.HasValue && cancellationToken.Value.IsCancellationRequested)
-                    return Res.ValError<Action>(new Oration("Operation was cancelled"));
-
-                if (_newActionQueueStream.ParalyzeWaitItem<SharedTaskPool>().OnError(out var error))
+                catch (Exception ex)
                 {
-                    return error.Cast<Action>();
+                    return new ExceptionResult<T>(ex, new Oration("An exception occurred"));
                 }
             }
-        }
+        };
+        return QueueAction(() => task.BuildRunner()).OnError(out var queueError)
+            ? Task.FromResult(queueError.Cast<T>())
+            : task.WaitResult();
+    }
 
-
-
-        public SynchronizationContext BuildSynchronizationContext() => new PoolContext(this);
-
-        public Task<Result<T>> BuildTask<T>(Func<Result<T>> func)
+    public Task<Result<T>> BuildTask<T>(Func<Task<Result<T>>> func)
+    {
+        var task = new MaxiAsyncTask<T>
         {
-            var task = new MaxiAsyncTask<T>()
+            Action = async _ =>
             {
-                Action = async (_) =>
+                try
                 {
-                    try
-                    {
-                        return func();
-                    }
-                    catch (Exception ex)
-                    {
-                        return new ExceptionResult<T>(ex, new Oration("An exception occurred"));
-                    }
+                    return await func();
                 }
-            };
-            if (QueueAction(() => task.BuildRunner()).OnError(out var queueError))
-                return Task.FromResult(queueError.Cast<T>());
-
-            return task.WaitResult();
-        }
-
-        public Task<Result<T>> BuildTask<T>(Func<Task<Result<T>>> func)
-        {
-            var task = new MaxiAsyncTask<T>()
-            {
-                Action = async (_) =>
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        return await func();
-                    }
-                    catch (Exception ex)
-                    {
-                        return new ExceptionResult<T>(ex, new Oration("An exception occurred"));
-                    }
+                    return new ExceptionResult<T>(ex, new Oration("An exception occurred"));
                 }
-            };
-            if (QueueAction(() =>
+            }
+        };
+        if (QueueAction(() =>
             {
                 if (task.BuildRunner().TryGetValue(out var action, out var buildError))
-                {
                     action();
-                }
                 else
-                {
                     Console.WriteLine(buildError);
-                }
             }).OnError(out var queueError))
-                return Task.FromResult(queueError.Cast<T>());
+            return Task.FromResult(queueError.Cast<T>());
 
-            return task.WaitResult();
-        }
+        return task.WaitResult();
+    }
 
-        public Task<Result<T>> BuildTask<T>(Func<Task<T>> func)
+    public Task<Result<T>> BuildTask<T>(Func<Task<T>> func)
+    {
+        var task = new MaxiAsyncTask<T>
         {
-            var task = new MaxiAsyncTask<T>()
+            Action = async ct =>
             {
-                Action = async (ct) =>
+                try
                 {
-                    try
-                    {
-                        return Res.Value(await func());
-                    }
-                    catch (Exception ex)
-                    {
-                        return new ExceptionResult<T>(ex, new Oration("An exception occurred"));
-                    }
+                    return Res.Value(await func());
                 }
-            };
-            if (QueueAction(() => task.BuildRunner()).OnError(out var queueError))
-                return Task.FromResult(queueError.Cast<T>());
+                catch (Exception ex)
+                {
+                    return new ExceptionResult<T>(ex, new Oration("An exception occurred"));
+                }
+            }
+        };
+        if (QueueAction(() => task.BuildRunner()).OnError(out var queueError))
+            return Task.FromResult(queueError.Cast<T>());
 
-            return task.WaitResult();
+        return task.WaitResult();
+    }
+
+
+    private sealed class PoolContext(SharedTaskPool pool) : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object? s)
+        {
+            pool.QueueAction(() => d(s));
         }
 
 
-
-        private sealed class PoolContext(SharedTaskPool pool) : SynchronizationContext
+        public override SynchronizationContext CreateCopy()
         {
-            public override void Post(SendOrPostCallback d, object? s) =>
-
-                pool.QueueAction(() => d(s));
-
-
-            public override SynchronizationContext CreateCopy() => this;
+            return this;
         }
     }
 }

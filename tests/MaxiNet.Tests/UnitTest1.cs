@@ -1,54 +1,46 @@
-﻿using MaxiNet;
+﻿using Xunit.Abstractions;
 
-namespace MaxiNetTests;
+namespace MaxiNet.Tests;
 
-public class PruebasTests
+public class DebugTests(ITestOutputHelper testOutputHelper)
 {
-    [Fact]
-    public async Task UnaPruebita()
-    {
-        var resultado = await Task.FromResult(42);
-        Assert.Equal(42, resultado);
-    }
-
-
     [Fact]
     public async Task TestTocMain()
     {
-        Console.WriteLine("Starting Toc.Ruminate test...");
+        testOutputHelper.WriteLine("Starting Toc.Ruminate test...");
         var result1 = Toc.Ruminate(async () =>
         {
-            Console.WriteLine("Hello, world 1!");
+            testOutputHelper.WriteLine("Hello, world 1!");
             await Task.Delay(3000);
-            Console.WriteLine("Goodbye, world 1!");
+            testOutputHelper.WriteLine("Goodbye, world 1!");
             return Res.Value(1);
         });
         var result2 = Toc.Ruminate(async () =>
         {
-            Console.WriteLine("Hello, world 2!");
+            testOutputHelper.WriteLine("Hello, world 2!");
             await Task.Delay(5000);
-            Console.WriteLine("Goodbye, world!");
+            testOutputHelper.WriteLine("Goodbye, world!");
             return Res.Value(2);
         });
         var result3 = Toc.Ruminate(async () =>
         {
-            Console.WriteLine("Hello, world 3!");
+            testOutputHelper.WriteLine("Hello, world 3!");
             await Task.Delay(7500);
-            Console.WriteLine("Goodbye, world 3!");
+            testOutputHelper.WriteLine("Goodbye, world 3!");
             return Res.Value(3);
         });
 
         var result4 = Toc.Ruminate(async () =>
         {
-            Console.WriteLine("Hello, world 4!");
+            testOutputHelper.WriteLine("Hello, world 4!");
             await Task.Delay(12000);
-            Console.WriteLine("Goodbye, world 4!");
+            testOutputHelper.WriteLine("Goodbye, world 4!");
             return Res.Value(4);
         });
 
-        var result5 = Toc.Ruminate<int>(async () =>
+        var result5 = Toc.Ruminate(async () =>
         {
-            Console.WriteLine("Hello, world 5!");
+            testOutputHelper.WriteLine("Hello, world 5!");
             await Task.Delay(7500);
             return Res.ValError<int>(new Oration("An error occurred"));
         });
@@ -60,6 +52,5 @@ public class PruebasTests
         Assert.Equal(Res.Value(2), results[1]);
         Assert.Equal(Res.Value(3), results[2]);
         Assert.Equal(Res.Value(4), results[3]);
-
     }
 }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/maxiro/Proyectos/SuperSharp/MaxiNet/Prueba/Prueba.csproj": {}
+    "/home/maxiro/Proyectos/TopSecret/MaxiNet/Prueba/Prueba.csproj": {}
   },
   "projects": {
-    "/home/maxiro/Proyectos/SuperSharp/MaxiNet/Prueba/Prueba.csproj": {
+    "/home/maxiro/Proyectos/TopSecret/MaxiNet/Prueba/Prueba.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/Prueba/Prueba.csproj",
+        "projectUniqueName": "/home/maxiro/Proyectos/TopSecret/MaxiNet/Prueba/Prueba.csproj",
         "projectName": "Prueba",
-        "projectPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/Prueba/Prueba.csproj",
+        "projectPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/Prueba/Prueba.csproj",
         "packagesPath": "/home/maxiro/.nuget/packages/",
-        "outputPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/Prueba/obj/",
+        "outputPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/Prueba/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/maxiro/.nuget/NuGet/NuGet.Config"

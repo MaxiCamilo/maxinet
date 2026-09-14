@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/maxiro/Proyectos/SuperSharp/MaxiNet/tests/MaxiNet.Tests/MaxiNet.Tests.csproj": {}
+    "/home/maxiro/Proyectos/TopSecret/MaxiNet/tests/MaxiNet.Tests/MaxiNet.Tests.csproj": {}
   },
   "projects": {
-    "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj": {
+    "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj",
+        "projectUniqueName": "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj",
         "projectName": "MaxiNet",
-        "projectPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj",
+        "projectPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj",
         "packagesPath": "/home/maxiro/.nuget/packages/",
-        "outputPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/",
+        "outputPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/maxiro/.nuget/NuGet/NuGet.Config"
@@ -338,14 +338,14 @@
         }
       }
     },
-    "/home/maxiro/Proyectos/SuperSharp/MaxiNet/tests/MaxiNet.Tests/MaxiNet.Tests.csproj": {
+    "/home/maxiro/Proyectos/TopSecret/MaxiNet/tests/MaxiNet.Tests/MaxiNet.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/tests/MaxiNet.Tests/MaxiNet.Tests.csproj",
+        "projectUniqueName": "/home/maxiro/Proyectos/TopSecret/MaxiNet/tests/MaxiNet.Tests/MaxiNet.Tests.csproj",
         "projectName": "MaxiNet.Tests",
-        "projectPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/tests/MaxiNet.Tests/MaxiNet.Tests.csproj",
+        "projectPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/tests/MaxiNet.Tests/MaxiNet.Tests.csproj",
         "packagesPath": "/home/maxiro/.nuget/packages/",
-        "outputPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/tests/MaxiNet.Tests/obj/",
+        "outputPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/tests/MaxiNet.Tests/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/maxiro/.nuget/NuGet/NuGet.Config"
@@ -361,8 +361,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj": {
-                "projectPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj"
+              "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj": {
+                "projectPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj"
               }
             }
           }
@@ -385,19 +385,23 @@
           "dependencies": {
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
-              "version": "[17.14.1, )"
+              "version": "[18.10.0, )"
             },
             "coverlet.collector": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[6.0.4, )"
+              "version": "[10.0.1, )"
             },
             "xunit": {
               "target": "Package",
               "version": "[2.9.3, )"
             },
             "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[3.1.4, )"
+              "version": "[4.0.0, )"
             }
           },
           "imports": [

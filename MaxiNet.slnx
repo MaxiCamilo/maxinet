@@ -1,15 +1,5 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="lib/MaxiNet.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/MaxiNet.Tests/MaxiNet.Tests.csproj" />
-  </Folder>
-  <Folder Name="/MyPhotinoApp/">
-    <Project Path="MyPhotinoApp/HelloPhotino.NET.csproj" />
-  </Folder>
-  <Folder Name="/TestApp/">
-    <Project Path="TestApp/TestApp.csproj" />
-  </Folder>
+<Solution>  
+  <Project Path="lib/MaxiNet.csproj" />  
+  <Project Path="tests/MaxiNet.Tests/MaxiNet.Tests.csproj" />  
   <Project Path="Prueba/Prueba.csproj" />
 </Solution>

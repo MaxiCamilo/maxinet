@@ -4,7 +4,7 @@ internal class SyncStreamController<T> : Disposable, IStreamController<T>, IStre
 {
     private readonly List<IStreamChildForController<T>> _children = [];
 
-    int _lastID = 1;
+    private int _lastID = 1;
 
 
     public Result<IStream<T>> BuildStream()
@@ -14,27 +14,20 @@ internal class SyncStreamController<T> : Disposable, IStreamController<T>, IStre
         var id = _lastID;
         _lastID += 1;
 
-        var child = new SyncStream<T>() { controller = this, Identifier = id };
+        var child = new SyncStream<T> { controller = this, Identifier = id };
         _children.Add(child);
         return Res.Value<IStream<T>>(child);
     }
-
 
 
     public Result<Nothing> AddItem(T item)
     {
         if (this.ErrorIfDispose() is ResultFailure<Nothing> failure) return failure;
 
-        foreach (var child in _children)
-        {
-
-            child.DeclareNewItem(item);
-
-        }
+        foreach (var child in _children) child.DeclareNewItem(item);
 
         return Res.Ok;
     }
-
 
 
     public bool ChildConsultsActivity(IStreamChildForController<T> child)
@@ -47,45 +40,25 @@ internal class SyncStreamController<T> : Disposable, IStreamController<T>, IStre
         if (IsDisposed) return;
 
         var realInstance = _children.FirstOrDefault(c => c.Identifier == child.Identifier);
-        if (realInstance != null)
-        {
-            _children.Remove(realInstance);
-
-        }
+        if (realInstance != null) _children.Remove(realInstance);
     }
-
 
 
     protected override void PerformDispose()
     {
         var clon = _children.ToArray();
         _children.Clear();
-        foreach (var child in clon)
-        {
-            child.DeclareAsClosed();
-        }
-
-
+        foreach (var child in clon) child.DeclareAsClosed();
     }
-
-
 }
 
 internal class SyncStream<T> : Disposable, IStream<T>, IStreamChildForController<T>
 {
-    private bool _declaredClosed = false;
-    private LinkedList<Action<T>> _listeners = new LinkedList<Action<T>>();
-    private LinkedList<Action> _closedListeners = new LinkedList<Action>();
+    private readonly LinkedList<Action> _closedListeners = new();
+    private readonly LinkedList<Action<T>> _listeners = new();
+    private bool _declaredClosed;
 
-    public required int Identifier
-    {
-        get; init;
-    }
-
-    public required IStreamControllerForChild<T> controller
-    {
-        get; init;
-    }
+    public required IStreamControllerForChild<T> controller { get; init; }
 
 
     public Result<Nothing> Listen(Action<T> onItem, Action? onClosed)
@@ -93,20 +66,16 @@ internal class SyncStream<T> : Disposable, IStream<T>, IStreamChildForController
         if (this.ErrorIfDispose() is IFailure failure) return failure.Cast<Nothing>();
 
         _listeners.AddLast(onItem);
-        if (onClosed != null)
-        {
-            _closedListeners.AddLast(onClosed);
-        }
+        if (onClosed != null) _closedListeners.AddLast(onClosed);
         return Res.Ok;
     }
 
+    public required int Identifier { get; init; }
 
 
     public void DeclareNewItem(T item)
     {
-
         foreach (var listener in _listeners)
-        {
             try
             {
                 listener(item);
@@ -115,28 +84,19 @@ internal class SyncStream<T> : Disposable, IStream<T>, IStreamChildForController
             {
                 Console.WriteLine($"Exception thrown while processing item in stream: {ex}. This is wrong!");
             }
-        }
-
     }
 
     public void DeclareAsClosed()
     {
-        if (_declaredClosed)
-        {
-            return;
-        }
+        if (_declaredClosed) return;
 
         _declaredClosed = true;
         Dispose();
-
     }
 
     protected override void PerformDispose()
     {
-        if (!_declaredClosed)
-        {
-            controller.ChildDeclaredClosed(this);
-        }
+        if (!_declaredClosed) controller.ChildDeclaredClosed(this);
 
         _listeners.Clear();
 
@@ -144,7 +104,6 @@ internal class SyncStream<T> : Disposable, IStream<T>, IStreamChildForController
         try
         {
             foreach (var closedListener in _closedListeners)
-            {
                 try
                 {
                     closedListener();
@@ -153,7 +112,6 @@ internal class SyncStream<T> : Disposable, IStream<T>, IStreamChildForController
                 {
                     Console.WriteLine($"Exception thrown while processing stream closure: {ex}. This is wrong!");
                 }
-            }
         }
 
 
@@ -163,6 +121,5 @@ internal class SyncStream<T> : Disposable, IStream<T>, IStreamChildForController
         }
 
         _closedListeners.Clear();
-
     }
 }

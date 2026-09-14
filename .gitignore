@@ -1,0 +1,9 @@
+lib/bin
+lib/obj
+
+test/bin
+test/obj
+
+tests/MaxiNet.Tests/bin
+tests/MaxiNet.Tests/obj
+

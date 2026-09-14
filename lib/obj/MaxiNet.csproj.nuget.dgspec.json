@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj": {}
+    "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj": {}
   },
   "projects": {
-    "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj": {
+    "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj",
+        "projectUniqueName": "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj",
         "projectName": "MaxiNet",
-        "projectPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/MaxiNet.csproj",
+        "projectPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/MaxiNet.csproj",
         "packagesPath": "/home/maxiro/.nuget/packages/",
-        "outputPath": "/home/maxiro/Proyectos/SuperSharp/MaxiNet/lib/obj/",
+        "outputPath": "/home/maxiro/Proyectos/TopSecret/MaxiNet/lib/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/maxiro/.nuget/NuGet/NuGet.Config"

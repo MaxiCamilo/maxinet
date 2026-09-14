@@ -1,30 +1,35 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Themes.Fluent;
+using Semi.Avalonia;
 
-class Program
+internal class Program
 {
     public static void Main(string[] args)
     {
-
         AppBuilder.Configure<Application>()
-                  .UsePlatformDetect()
-                  .Start(AppMain, args);
+            .UsePlatformDetect()
+            .Start(AppMain, args);
     }
 
-    static void AppMain(Application app, string[] args)
+    private static void AppMain(Application app, string[] args)
     {
-
-        app.Styles.Add(new Semi.Avalonia.SemiTheme());
+        app.Styles.Add(new SemiTheme());
 
         var window = new Window
         {
             Title = "Hello from Code",
             Width = 400,
             Height = 300,
-            Content = new DockPanel()
+            Content = new WrapPanel
             {
-                
+                ItemSpacing = 10,
+                LineSpacing = 10,
+                Children =
+                {
+                    new TextBlock { Text = "Hello, StackPanel!" },
+                    new TextBlock { Text = "Hello, StackPanel!" },
+                    new TextBlock { Text = "Hello, StackPanel!" }
+                }
             }
         };
 
