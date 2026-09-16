@@ -12,10 +12,10 @@ internal class QuerySource<T>: IQuerySource<T>
         var iterator = order == OrderType.Descending ? Sorter.DescendingEnumerable() : Sorter.AscendingEnumerable();
         ICollection<T> result = (limit is 0 or null) ? new LinkedList<T>() : new List<T>((int)limit);
 
-        EntityMemorySourceConditioner<T>? conditioner = null;
+        SourceConditioner<T>? conditioner = null;
         if (conditions is { Count: > 0 })
         {
-            conditioner = new EntityMemorySourceConditioner<T>()
+            conditioner = new SourceConditioner<T>()
             {
                 IdentifierGetter = IdentifierGetter,
                 Conditions = conditions,

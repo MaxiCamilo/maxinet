@@ -4,6 +4,7 @@ namespace MaxiNet;
 
 internal interface IMemoryListSorter<T>
 {
+    public int Count { get; }
     public Result<Nothing> Set(uint id, T item);
     public Result<Nothing> SetAll(IDictionary<uint,T> values);
     
@@ -18,4 +19,12 @@ internal interface IMemoryListSorter<T>
 
     IEnumerable< KeyValuePair<uint,T>> AscendingEnumerable(uint from = 0);
     IEnumerable< KeyValuePair<uint,T>> DescendingEnumerable(uint from = 0);
+
+    public uint ObtainMax();
+    
+    public uint ObtainMin();
+
+    public T? ObtainItem(uint id);
+
+    public IEnumerable<KeyValuePair<uint, T?>> ObtainMultipleItems(List<uint> ids);
 }

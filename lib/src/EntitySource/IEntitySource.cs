@@ -9,7 +9,7 @@ public enum OrderType
 
 public interface IQuerySource<T>
 {
-    public IAsyncEnumerable<Result<ICollection<T>>> Query(List<ICondition>? conditions, uint? limit = null,
+    public IAsyncEnumerable<Result<ICollection<T>>> Query(List<ICondition>? conditions = null, uint? limit = null,
         OrderType order = OrderType.Disordered);
 
     public Task<Result<uint>> Count(List<ICondition>? conditions);
@@ -25,7 +25,7 @@ public interface ICompleteDeleteSource<T>
     public Task<Result<Nothing>> DeleteAll();
 }
 
-public interface IEntitySource<in T>
+public interface IEntitySource<T>
 {
     public string PrimaryKey { get; }
 
@@ -45,6 +45,9 @@ public interface IEntitySourceQuery<T>
         List<ICondition>? conditions, uint? limit = null, OrderType order = OrderType.Disordered);
 
     public IAsyncEnumerable<Result<ICollection<T>>> Select(List<uint> identifiers, uint? parts = null);
+    
+    public IAsyncEnumerable<Result<ICollection<T>>> QueryRange( uint? maximum ,List<ICondition>? conditions, uint from = 0,uint? limit = null,
+        OrderType order = OrderType.Disordered);
 
     public IAsyncEnumerable<Result<ICollection<T>>> CheckAndSelect(List<uint> identifiers, uint? parts = null);
 }
@@ -59,8 +62,20 @@ public interface ISourceDeleteByIdentifier
     public Task<Result<Nothing>> DeleteByIdentifier(IAsyncEnumerable<Result<ICollection<uint>>> content);
 }
 
-public interface IEntitySourceEditor<T> :  IEntitySourceQuery<T>
+public interface IEntitySourceEditor<T>
 {
     public Task<Result<Nothing>> Aggregate(IAsyncEnumerable<Result<ICollection<T>>> content, bool zeroKeyAutoAssign);
     public Task<Result<Nothing>> Modifier(IAsyncEnumerable<Result<ICollection<T>>> content);
+}
+
+public interface IEntityStorage<T>
+{
+    public IQuerySource<T> Query { get; }
+    public IAllocateSource<T> Allocate { get; }
+    public ICompleteDeleteSource<T> CompleteDelete { get; }
+    public IEntitySource<T> SourceConfig { get; }
+    public IEntitySourceQuery<T> EntityQuery { get; }
+    public ISourceDeleteByQuery DeleteByQuery { get; }
+    public ISourceDeleteByIdentifier DeleteByIdentifier { get; }
+    public IEntitySourceEditor<T> Editor { get; }
 }

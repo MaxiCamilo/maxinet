@@ -247,7 +247,93 @@ internal class MemoryListSorter<T> : IMemoryListSorter<T>
 
     public uint ObtainMin()
     {
-        throw new NotImplementedException();
+        if (_memoryInstance.Count == 0)
+        {
+            return 0;
+        }
+
+        if (_memoryInstance is SortedList<uint, T> shorted)
+        {
+            return shorted.Keys[0];
+        }
+        else
+        {
+            return _memoryInstance.First().Key;
+        }
+    }
+
+    public T? ObtainItem(uint id)
+    {
+        if (_memoryInstance.Count == 0) return default;
+
+        if (_memoryInstance is SortedList<uint, T> list)
+        {
+            var position = list.Keys.BinarySearch(id);
+            return position < 0 ? default : list.Values[position];
+        }
+
+        foreach (var pair in _memoryInstance)
+        {
+            if (pair.Key == id)
+            {
+                return pair.Value;
+            }
+        }
+        
+        return  default;
+    }
+    
+    public IEnumerable<KeyValuePair<uint, T?>> ObtainMultipleItems(List<uint> ids)
+    {
+        
+        if (_memoryInstance.Count == 0 || ids.Count == 0) yield break;
+
+        var identifier = ids.ToList();
+        identifier.Sort();
+
+        if (_memoryInstance is SortedList<uint, T> list)
+        {
+            var position = list.Keys.BinarySearch(identifier[0]);
+            if(position < 0)
+            {
+                yield return new KeyValuePair<uint, T?>(identifier[0], default);
+                yield break;
+            }
+            else
+            {
+                yield return new KeyValuePair<uint, T?>(identifier[0], list.Values[position]);
+            }
+
+            for (int i = 1; i < identifier.Count; i++)
+            {
+                position = list.Keys.BinarySearch(identifier[i]);
+                if (position < 0)
+                {
+                    yield return new KeyValuePair<uint, T?>(identifier[i], default);
+                }
+                else
+                {
+                    yield return new KeyValuePair<uint, T?>(identifier[i], list.Values[position]);
+                }
+            }
+        }
+
+        foreach (KeyValuePair<uint, T> pair in _memoryInstance)
+        {
+            T? item = default;
+            foreach (var id in ids)
+            {
+                if (pair.Key == id)
+                {
+                    item = pair.Value;
+                    break;
+                }
+            }
+
+            yield return new KeyValuePair<uint, T?>(pair.Key, item);
+        }
+        
+        
     }
 
     private IEnumerable<KeyValuePair<uint, T>> DescendingEnumerable(SortedList<uint, T> list, uint from)
