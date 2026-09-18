@@ -25,7 +25,7 @@ internal class MaxiAsyncTask<T> : Initializable, IMaxiAsyncTask
             () => ExecutionContext.Run(_executionContext!, static s => ((MaxiAsyncTask<T>)s!).StarOrResumeTask(), this);
 
 
-        return Res.Value(envuelto);
+        return Res.Value<Action>(envuelto);
     }
 
 

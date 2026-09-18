@@ -11,6 +11,7 @@ internal interface IMemoryListSorter<T>
     public Result<Nothing> RemoveAll();
     public Result<Nothing> Remove(uint id);
     public Result<Nothing> RemoveAll(IEnumerable<uint> ids);
+    public Result<Nothing> RemoveWhere(Predicate<T> predicate);
     
     public Result<bool> Exists(uint id);
     public IEnumerable<KeyValuePair<uint,bool>> Exists(IEnumerable<uint> ids);

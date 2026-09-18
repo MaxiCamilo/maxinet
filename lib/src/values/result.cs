@@ -5,10 +5,6 @@ namespace MaxiNet;
 
 public abstract class Result<T>
 {
-    public static implicit operator Result<T>(Func<T> fn)
-    {
-        return ResultFactory.Try(new Oration("An error occurred"), fn);
-    }
 
     public bool TryGetValue(
         [MaybeNullWhen(false)] out T value,
@@ -113,6 +109,56 @@ public static class Res
     {
         return new NegativeResult<T>(message);
     }
+    
+    public static Result<Nothing> Volatile(Oration message, Action func)
+    {
+        try
+        {
+            func();
+            return Res.Ok;
+        }
+        catch (OperationCanceledException)
+        {
+            return new CancellationResult<Nothing>();
+        }
+        catch (Exception e)
+        {
+            return new ExceptionResult<Nothing>(e, message);
+        }
+    }
+
+    public static Result<T> Volatile<T>(Oration message, Func<T> func)
+    {
+        try
+        {
+            return new ResultValue<T>(func());
+        }
+        catch (OperationCanceledException)
+        {
+            return new CancellationResult<T>();
+        }
+        catch (Exception e)
+        {
+            return new ExceptionResult<T>(e, message);
+        }
+    }
+
+    public static async Task<Result<T>> AsyncVolatile<T>(Oration message, Func<Task<T>> func)
+    {
+        try
+        {
+            var result = await func();
+            return new ResultValue<T>(result);
+        }
+        catch (OperationCanceledException)
+        {
+            return new CancellationResult<T>();
+        }
+        catch (Exception e)
+        {
+            return new ExceptionResult<T>(e, message);
+        }
+    }
 }
 
 public interface IFailure
@@ -183,10 +229,6 @@ public readonly struct Nothing : IEquatable<Nothing>
 
 public abstract class ResultFailure<T> : Result<T>, IFailure
 {
-    private protected ResultFailure()
-    {
-    }
-
     public abstract Oration Message { get; }
     public abstract Result<TR> Cast<TR>();
 }

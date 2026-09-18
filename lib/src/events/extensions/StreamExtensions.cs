@@ -1,3 +1,5 @@
+using MaxiNet.events.controller;
+
 namespace MaxiNet;
 
 public static class StreamExtensions
@@ -49,4 +51,12 @@ public static class StreamExtensions
 
         return error.Cast<T>();
     }
+
+    public static IStream<TR> Map<T, TR>(this IStream<T> stream, Func<T, TR> func) => new StreamReference<T,TR>(){ MainSource = stream, Transform = func };
+    
+    public static IStream<T> Where<T>(this IStream<T> stream, Predicate<T> predicate) => new StreamReference<T,T>(){ MainSource = stream, Predicate = predicate,Transform = (x) => x };
+
+    public static IStream<TR> WhereType<T,TR>(this IStream<T> stream) where TR : T => new StreamReference<T,TR>(){ MainSource = stream, Predicate = (x) => x is TR,Transform = (x) => (TR)x! };
+    
+
 }

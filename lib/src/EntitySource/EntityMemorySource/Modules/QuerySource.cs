@@ -5,7 +5,6 @@ internal class QuerySource<T>: IQuerySource<T>
     public required IMemoryListSorter<T>  Sorter { get; init; }
 
     public required Func<T, uint> IdentifierGetter{ get; init; }
-    public required Func<T, uint, Result<Nothing>> IdentifierSetter{ get; init; }
     
     public async IAsyncEnumerable<Result<ICollection<T>>> Query(List<ICondition>? conditions, uint? limit = null, OrderType order = OrderType.Disordered)
     {
@@ -21,7 +20,6 @@ internal class QuerySource<T>: IQuerySource<T>
                 Conditions = conditions,
             };
         }
-        
 
         foreach (var item in iterator)
         {

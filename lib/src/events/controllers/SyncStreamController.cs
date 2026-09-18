@@ -14,7 +14,7 @@ internal class SyncStreamController<T> : Disposable, IStreamController<T>, IStre
         var id = _lastID;
         _lastID += 1;
 
-        var child = new SyncStream<T> { controller = this, Identifier = id };
+        var child = new SyncStream<T> { Controller = this, Identifier = id };
         _children.Add(child);
         return Res.Value<IStream<T>>(child);
     }
@@ -58,7 +58,7 @@ internal class SyncStream<T> : Disposable, IStream<T>, IStreamChildForController
     private readonly LinkedList<Action<T>> _listeners = new();
     private bool _declaredClosed;
 
-    public required IStreamControllerForChild<T> controller { get; init; }
+    public required IStreamControllerForChild<T> Controller { get; init; }
 
 
     public Result<Nothing> Listen(Action<T> onItem, Action? onClosed)
@@ -96,7 +96,7 @@ internal class SyncStream<T> : Disposable, IStream<T>, IStreamChildForController
 
     protected override void PerformDispose()
     {
-        if (!_declaredClosed) controller.ChildDeclaredClosed(this);
+        if (!_declaredClosed) Controller.ChildDeclaredClosed(this);
 
         _listeners.Clear();
 

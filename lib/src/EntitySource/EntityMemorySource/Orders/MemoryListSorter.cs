@@ -63,6 +63,38 @@ internal class MemoryListSorter<T> : IMemoryListSorter<T>
         return Res.Ok;
     }
 
+    public Result<Nothing> RemoveWhere(Predicate<T> predicate)
+    {
+        if (_memoryInstance is SortedList<uint, T> list)
+        {
+            int i = 0;
+            while (i < list.Count)
+            {
+                if (predicate(list.Values[i]))
+                {
+                    list.RemoveAt(i);
+                }
+                else
+                {
+                    i += 0;
+                }
+            }
+        }
+        else
+        {
+            LinkedList<uint> ids = new();
+
+            foreach (var item in _memoryInstance)
+            {
+                if(predicate(item.Value)) ids.AddLast(item.Key);
+            }
+
+            foreach (var id in ids) _memoryInstance.Remove(id);
+        }
+
+        return Res.Ok;
+    }
+
     public Result<Nothing> RemoveAll(IEnumerable<uint> ids)
     {
         foreach (var id in ids)
