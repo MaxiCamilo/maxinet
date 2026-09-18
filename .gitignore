@@ -4,6 +4,12 @@ lib/obj
 test/bin
 test/obj
 
+Prueba/obj
+Prueba/bin
+
+TestApp/obj
+TestApp/bin
+
 tests/MaxiNet.Tests/bin
 tests/MaxiNet.Tests/obj
 
